@@ -153,3 +153,5 @@ SentimentScore ~ HeatCount*f(State,model="iid") +
 SentimentScore ~ HeatCount + HeatCount滞后项 + f(State, model="iid") +
                  f(空间效应, time=时间指示变量, model="spde", group=County)
 这允许模型自动学习每个时间点上空间相关模式的差异。
+
+0426meeting
