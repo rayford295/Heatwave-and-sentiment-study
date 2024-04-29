@@ -155,3 +155,24 @@ SentimentScore ~ HeatCount + HeatCount滞后项 + f(State, model="iid") +
 这允许模型自动学习每个时间点上空间相关模式的差异。
 
 0426meeting
+当前情况总结
+1.Start from simple linear models 
+BASE Model: for the entire US by county; You can try to add in the below spatial/temporal/fixed effects using back/forward entry to find out the best combinations. 
+Sentiment ~ Spatial effect (input of state polygon and county polygon) + temporal effect (year, month, week, weekend, and holiday) + fixed effect (vulnerability, events)
+这一步主要是确定base model是什么，我们这里最后确定的是时间+空间+Vulnerability index (THEMES)
+
+2.ADVANCED Model with no lag: 
+BASE MODEL + heatwave 
+BASE MODEL + air pollution 
+BASE MODEL + rainfall 
+BASE MODEL + heatwave + air pollution
+BASE MODEL + heatwave + rainfall
+BASE MODEL + air pollution + rainfall
+BASE MODEL + heatwave + air pollution + rainfall
+第二步的核心就是探索heatwave, air pollution, 和rainfall这些变量在基础模型的情况下产生的影响。对比基础模型，从而说明这些变量是需要考虑的
+
+3.After select the above best model then add DLNM: ADVANCED Model with DLNM
+DLNM with lag 1-14 days
+这一步就是增加延迟模型，我们认为这个结果可能是具有延迟效应的
+
+4.需要考虑空间自相关，我们这里有country的shapefile文件和每个country的geoID，这种情况下，我可以确定出每个县的相邻关系，我们想看这些因素heatwave, air pollution, 和rainfall是否满足空间自相关
