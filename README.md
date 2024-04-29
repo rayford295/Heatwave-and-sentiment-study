@@ -156,6 +156,8 @@ SentimentScore ~ HeatCount + HeatCount滞后项 + f(State, model="iid") +
 
 0426meeting
 当前情况总结
+
+
 1.Start from simple linear models 
 BASE Model: for the entire US by county; You can try to add in the below spatial/temporal/fixed effects using back/forward entry to find out the best combinations. 
 Sentiment ~ Spatial effect (input of state polygon and county polygon) + temporal effect (year, month, week, weekend, and holiday) + fixed effect (vulnerability, events)
