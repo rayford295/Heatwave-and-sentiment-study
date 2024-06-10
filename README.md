@@ -197,3 +197,6 @@ PyMC3：提供了更广泛的模型构建和定制选项。使用PyMC3，研究�
 
 代码中没有直接使用 iteritems()，但仍遇到了 AttributeError: 'DataFrame' object has no attribute 'iteritems' 这一错误，那么问题可能是由于 rpy2 库在与 Pandas 的交互中引起的。这可能是因为 rpy2 使用了在旧版本 Pandas 中存在的方法，而这些方法在新版本中已经被移除或更改。
 
+The errors regarding using R's INLA library have been resolved and I can run the model successfully. However, when comparing the results of the basic model and the basic model + heatwave or the basic model + precipitation we set previously, the model’s result information criteria (such as AIC, BIC) and marginal log-likelihood (Marginal Log-Likelihood, MLL ) has not changed much. 
+Code link：
+https://colab.research.google.com/drive/1hR03T-icNB3pHHdSxZTAgq4en5lS8p5Z?usp=sharing
