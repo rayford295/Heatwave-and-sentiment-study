@@ -200,3 +200,6 @@ PyMC3：提供了更广泛的模型构建和定制选项。使用PyMC3，研究�
 The errors regarding using R's INLA library have been resolved and I can run the model successfully. However, when comparing the results of the basic model and the basic model + heatwave or the basic model + precipitation we set previously, the model’s result information criteria (such as AIC, BIC) and marginal log-likelihood (Marginal Log-Likelihood, MLL ) has not changed much. 
 Code link：
 https://colab.research.google.com/drive/1hR03T-icNB3pHHdSxZTAgq4en5lS8p5Z?usp=sharing
+
+0612
+以加州为例，直接看整个加州的各县之间的包含地理属性的INLA模型
