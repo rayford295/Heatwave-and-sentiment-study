@@ -203,15 +203,26 @@ https://colab.research.google.com/drive/1hR03T-icNB3pHHdSxZTAgq4en5lS8p5Z?usp=sh
 
 0612
 以加州为例，直接看整个加州的各县之间的包含地理属性的INLA模型
-import geopandas as gpd
-import pandas as pd
-from rpy2 import robjects as ro
-from rpy2.robjects import pandas2ri
-from rpy2.robjects.conversion import localconverter
-from rpy2.rinterface_lib.embedded import RRuntimeError
 
-# 激活Pandas DataFrame到R data.frame的自动转换
-pandas2ri.activate()
+现在有加州的数据集叫"/content/TestData_California.csv"，这里有加州的county的geoid，heatwave，降水等数据。还有全美国的shapefile文件，"/content/County.shp"，包含所有县的geoid。这两个数据集的连接之处是geoid，但是需要注意的是/content/TestData_California.csv这个数据集的县的id需要前面的前缀加一个0，才跟shapefile的数据集相吻合。我们需要shapefile知道加州县的临界关系。其次，我们使用INLA库来看SentimentScore和不同变量之间的关系，我们希望考虑进去空间位置关系。
+
+
+# 更新模型公式以包含空间效应
+spatial_model_formula = """
+SentimentScore ~ as.factor(CountyName) + as.factor(Year) + as.factor(Month) +
+                  Week + Weekend + Holiday + VulnerabilityIndex +
+                  f(spatial_effect, model = "besag", graph = lw)
+"""
+
+# 定义包含空间效应的模型
+models = {
+    "Spatial Model + Heatwave": spatial_model_formula + " + HeatCount",
+    "Spatial Model + Air Pollution": spatial_model_formula + " + AirPolllution_Interpolate",
+    "Spatial Model + Precipitation": spatial_model_formula + " + Precipitation",
+    "Spatial Model + All Environmental Factors": spatial_model_formula + " + HeatCount + AirPolllution_Interpolate + Precipitation"
+}
+
+
 
 # 加载 Shapefile
 shapefile_path = "/content/County.shp"
@@ -230,68 +241,4 @@ df['GEOID'] = '0' + df['GEOID'].astype(str)
 # 合并数据集
 merged_df = gdf.merge(df, left_on='GEOID', right_on='GEOID')
 
-# 删除 'ALAND' 和 'AWATER' 列，并将 'geometry' 列转换为 WKT 格式
-merged_df = merged_df.drop(columns=['ALAND', 'AWATER'])
-merged_df['geometry'] = merged_df['geometry'].apply(lambda x: x.wkt)
 
-# 将合并后的 DataFrame 转换为 R 的 data.frame
-with localconverter(ro.default_converter + pandas2ri.converter):
-    r_df = pandas2ri.py2rpy(merged_df)
-
-# 尝试加载 INLA 和 spdep 库，捕获任何错误
-try:
-    ro.r('library(INLA)')
-    ro.r('library(spdep)')
-except RRuntimeError as e:
-    print(f"Failed to load INLA or spdep library in R: {e}")
-
-def run_inla_spatial_model(formula, data, spatial_data, model_name):
-    with localconverter(ro.default_converter + pandas2ri.converter):
-        ro.r.assign("r_df", data)
-        ro.r.assign("spatial_data", spatial_data)
-        try:
-            # 生成空间权重矩阵
-            ro.r('nb <- poly2nb(as(spatial_data, "Spatial"))')
-            ro.r('lw <- nb2listw(nb, style="W")')
-            
-            # 运行 INLA 模型并直接打印结果
-            result = ro.r(f"""
-                result <- inla(formula = {formula}, data = r_df, family = 'gaussian',
-                               control.compute = list(config = TRUE),
-                               control.predictor = list(A = inla.spde.make.A(lw)))
-                summary(result)
-            """)
-            print(f"Model: {model_name} completed successfully.")
-            return result
-        except RRuntimeError as e:
-            print(f"Error running INLA spatial model for {model_name}: {e}")
-            return None
-
-def run_all_models(models, data, spatial_data):
-    results = {}
-    for name, formula in models.items():
-        print(f"Running {name}")
-        result = run_inla_spatial_model(formula, data, spatial_data, name)
-        if result:
-            results[name] = result
-    return results
-
-# 更新模型公式以包含空间效应
-spatial_model_formula = """
-SentimentScore ~ as.factor(CountyName) + as.factor(Year) + as.factor(Month) +
-                  Week + Weekend + Holiday + VulnerabilityIndex +
-                  f(spatial_effect, model = "besag", graph = lw)
-"""
-
-# 定义包含空间效应的模型
-models = {
-    "Spatial Model + Heatwave": spatial_model_formula + " + HeatCount",
-    "Spatial Model + Air Pollution": spatial_model_formula + " + AirPolllution_Interpolate",
-    "Spatial Model + Precipitation": spatial_model_formula + " + Precipitation",
-    "Spatial Model + All Environmental Factors": spatial_model_formula + " + HeatCount + AirPolllution_Interpolate + Precipitation"
-}
-
-# 运行所有包含空间效应的模型
-model_results = run_all_models(models, r_df, gdf)
-
-这个数据格式上还是有问题
