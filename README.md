@@ -222,7 +222,7 @@ models = {
     "Spatial Model + All Environmental Factors": spatial_model_formula + " + HeatCount + AirPolllution_Interpolate + Precipitation"
 }
 
-
+使用R语言来完成这个工作
 
 # 加载 Shapefile
 shapefile_path = "/content/County.shp"
