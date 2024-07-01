@@ -1,0 +1,9 @@
+Model,DIC,logscore
+heatlag,27086.95,0.292
+heat,27075.66,0.292
+preclag,27025.04,0.291
+prec,27053.61,0.292
+airlag,26889.44,0.29
+air,27051.33,0.292
+stringencylag,,
+stringency,,
