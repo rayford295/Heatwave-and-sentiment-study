@@ -1,0 +1,5 @@
+Model,DIC,logscore
+base,34598.54,0.34
+air+prec,33844.5,0.332
+air+heat,33863.53,0.333
+aire+prec+heat,33841.3,0.332
