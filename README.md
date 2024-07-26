@@ -244,3 +244,6 @@ merged_df = gdf.merge(df, left_on='GEOID', right_on='GEOID')
 交互各个州的气候图，以及后续分析
 
 
+在使用inla模型的时候，出现了46id的州，base模型的问题
+
+
