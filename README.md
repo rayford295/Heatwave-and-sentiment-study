@@ -246,4 +246,6 @@ merged_df = gdf.merge(df, left_on='GEOID', right_on='GEOID')
 
 在使用inla模型的时候，出现了46id的州，base模型的问题
 
+stage3，多加了对结果的解释。
+
 
